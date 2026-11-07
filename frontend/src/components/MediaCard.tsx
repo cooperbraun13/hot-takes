@@ -1,3 +1,5 @@
+import { Film, Tv, BookOpen, Music, Gamepad2, Mic } from "lucide-react";
+import { useNavigate } from "react-router";
 import type { Media } from "../types";
 
 interface MediaCardProps {
@@ -5,37 +7,38 @@ interface MediaCardProps {
   rating?: number;
 }
 
-function MediaCard({ media, rating }: MediaCardProps) {
-  const icons = {
-    movie: "🎬",
-    tv: "📺",
-    book: "📚",
-    music: "🎵",
-    game: "🎮",
-    podcast: "🎙️",
-  };
-  function handleClick() {
-    window.location.assign(`/media/${media.id}`);
-  }
+const icons = {
+  movie: Film,
+  tv: Tv,
+  book: BookOpen,
+  music: Music,
+  game: Gamepad2,
+  podcast: Mic,
+};
+
+export default function MediaCard({ media, rating }: MediaCardProps) {
+  const navigate = useNavigate();
+  const Icon = icons[media.media_type];
 
   return (
-    <button className="media-card" onClick={handleClick}>
+    <button
+      className="media-card"
+      onClick={() => navigate(`/media/${media.id}`)}
+    >
       <div className="media-content">
         {media.cover_url ? (
           <img src={media.cover_url} alt={`${media.title} cover`} />
         ) : (
-          <span>{icons[media.media_type]}</span>
+          <div className="media-placeholder">
+            <Icon size={40} strokeWidth={1.5} />
+          </div>
         )}
-        <div>
-          <h3>{media.title}</h3>
-          <p>{media.media_type}</p>
-          {rating !== undefined && (
-            <p className="media-rating"> * {rating}/5</p>
-          )}
-        </div>
+
+        <h3>{media.title}</h3>
+        <p>{media.media_type}</p>
+
+        {rating !== undefined && <p className="media-rating">★ {rating}/5</p>}
       </div>
     </button>
   );
 }
-
-export default MediaCard;
