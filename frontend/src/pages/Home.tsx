@@ -1,46 +1,65 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router";
-import MediaCard, { type Media } from "../components/MediaCard";
+import CategoryCard from "../components/CategoryCard";
+import MediaCard from "../components/MediaCard";
+import type { Media, MediaCategory } from "../types";
 
-const categories: Record<string, string> = {
-  movies: "movie",
-  tv: "tv",
-  books: "book",
-  music: "album",
-  games: "game",
-};
+const categories: MediaCategory[] = [
+  { id: "movie", name: "Movies", icon: "🎬", path: "/movies", available: true },
+  { id: "tv", name: "TV", icon: "📺", path: "/tv", available: true },
+  { id: "book", name: "Books", icon: "📚", path: "/books", available: true },
+  { id: "music", name: "Music", icon: "🎵", path: "/music", available: true },
+  { id: "game", name: "Games", icon: "🎮", path: "/games", available: true },
+  { id: "podcast", name: "Podcasts", icon: "🎙️", path: "/podcasts", available: true },
+];
+
+const media: Media[] = [
+  {
+    id: "1",
+    external_source: "tmdb",
+    external_id: "157336",
+    title: "Interstellar",
+    media_type: "movie",
+    year: 2014,
+    cover_url: null,
+    description: "A science fiction movie.",
+  },
+  {
+    id: "2",
+    external_source: "igdb",
+    external_id: "example-minecraft",
+    title: "Minecraft",
+    media_type: "game",
+    year: 2011,
+    cover_url: null,
+    description: "A sandbox game.",
+  },
+  {
+    id: "3",
+    external_source: "sample",
+    external_id: "example-1984",
+    title: "1984",
+    media_type: "book",
+    year: 1949,
+    cover_url: null,
+    description: "A dystopian novel.",
+  },
+];
 
 export default function Home() {
-  const [media, setMedia] = useState<Media[]>([]);
-  const [error, setError] = useState("");
-  const { pathname } = useLocation();
-
-  useEffect(() => {
-    fetch("/api/media")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to load media");
-        return res.json();
-      })
-      .then(setMedia)
-      .catch(() => setError("Could not load media."));
-  }, []);
-
-  const category = pathname.slice(1);
-  const filtered = categories[category]
-    ? media.filter((item) => item.type === categories[category])
-    : media;
-
   return (
     <main>
-      <div className="page-header">
-        <h1>{category || "Explore"}</h1>
-        <p>Discover your next favorite.</p>
+      <h1>Explore</h1>
+      <p>Discover your next favorite.</p>
+
+      <h2>Categories</h2>
+      <div className="category-grid">
+        {categories.map((category) => (
+          <CategoryCard key={category.path} category={category} />
+        ))}
       </div>
 
-      {error && <p>{error}</p>}
-
+      <h2>Featured Media</h2>
       <div className="media-grid">
-        {filtered.map((item) => (
+        {media.map((item) => (
           <MediaCard key={item.id} media={item} />
         ))}
       </div>

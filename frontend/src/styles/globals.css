@@ -77,6 +77,39 @@ main {
   margin: 0;
 }
 
+/* categories */
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin: 24px 0 40px;
+}
+
+.category-card {
+  padding: 24px 16px;
+  background: #fff;
+  border: 1px solid #d5e1ec;
+  color: #22447e;
+  cursor: pointer;
+  text-align: center;
+  font: inherit;
+}
+
+.category-card:hover {
+  border-color: #f97316;
+}
+
+.category-icon {
+  font-size: 28px;
+}
+
+.category-card p {
+  margin: 12px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* media grid */
 
 .media-grid {

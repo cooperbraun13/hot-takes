@@ -14,6 +14,7 @@ export default function App() {
         <Route path="/books" element={<Home />} />
         <Route path="/music" element={<Home />} />
         <Route path="/games" element={<Home />} />
+        <Route path="/podcasts" element={<Home />} />
       </Routes>
     </BrowserRouter>
   );
