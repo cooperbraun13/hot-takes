@@ -1,4 +1,6 @@
-import os 
+from importlib.resources import path
+import os
+from xmlrpc import client 
 import httpx
 from dotenv import load_dotenv
 
@@ -16,7 +18,7 @@ def _img(path, size="w500"):
 async def _get(path, **params):
     params["api_key"] = os.getenv("MOVIES_TV")
     async with httpx.AsyncClient() as client:
-        res = await client.get(f"{BASE}/{path}", params=params)
+        res = await client.get(f"{BASE}/{path.lstrip('/')}", params=params)
         res.raise_for_status()
         return res.json()
     
