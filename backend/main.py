@@ -1,7 +1,8 @@
 # API endpoints
 import httpx
+from services import moviesAPI as tmdb
 from fastapi import HTTPException
-from services import tmdb
+
 
 @app.get("/api/search/movies")
 async def search_movies(q: str):
