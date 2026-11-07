@@ -16,6 +16,7 @@ export interface Take {
     id: string;
     media: Media;
     rating: number;
+    comment: string;
     created_at: string;
 }
 

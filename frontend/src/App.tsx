@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react"
-import "./App.css";
-import TopNav from "./components/TopNav";
-import MediaCard from "./components/MediaCard";
-// import {getfolders, getrecommendations} from "./services/api";
-import type {item} from "./types/items";
+import { BrowserRouter, Routes, Route } from "react-router";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
 
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Navbar />
 
-
-
-function App() {
-  const [folders, setfolders] = useState<item[]>([]);
-  const [recommendations, setrecommendations] = useState<item[]>([]);
-  const [searchResults, setsearchresults] = useState<item[]>([]);
-  const [active, setactive] = useState("");
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/movies" element={<Home />} />
+        <Route path="/tv" element={<Home />} />
+        <Route path="/books" element={<Home />} />
+        <Route path="/music" element={<Home />} />
+        <Route path="/games" element={<Home />} />
+        <Route path="/podcasts" element={<Home />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
-
-export default App
