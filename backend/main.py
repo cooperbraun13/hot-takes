@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from services import moviesAPI as tmdb
+from services import musicAPI
+
 
 app = FastAPI()
 
@@ -28,4 +30,21 @@ async def movie_details(movie_id: str):
         return await tmdb.get_movie(movie_id)
     except httpx.HTTPError as e:
         print("TMDB ERROR:", repr(e))
+        raise HTTPException(status_code=502, detail="Upstream API failed")
+    
+@app.get("/api/search/music")
+async def search_music(q: str):
+    try:
+        return await musicAPI.search_tracks(q)
+    except httpx.HTTPError as e:
+        print("SPOTIFY ERROR:", repr(e))
+        raise HTTPException(status_code=502, detail="Upstream API failed")
+
+
+@app.get("/api/music/{track_id}")
+async def music_details(track_id: str):
+    try:
+        return await musicAPI.get_track(track_id)
+    except httpx.HTTPError as e:
+        print("SPOTIFY ERROR:", repr(e))
         raise HTTPException(status_code=502, detail="Upstream API failed")
