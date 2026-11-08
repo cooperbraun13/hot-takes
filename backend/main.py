@@ -8,9 +8,11 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base
 from models import Media
 from schemas import MediaCreate, MediaResponse
+from routers import takes
 
 
 app = FastAPI()
+app.include_router(takes.router)
 
 app.add_middleware(
     CORSMiddleware,
