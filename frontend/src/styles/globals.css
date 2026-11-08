@@ -65,6 +65,82 @@ button {
 }
 
 /* layout */
+.profile-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #22447e;
+}
+
+.profile-link:hover,
+.profile-link.active {
+  color: #f97316;
+  background: #fff0e5;
+}
+
+.profile-link:focus-visible,
+.favorite-button:focus-visible {
+  outline: 2px solid #f97316;
+  outline-offset: 3px;
+}
+
+.profile-heading {
+  text-align: center;
+}
+
+.profile-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: #dce7f3;
+}
+
+.profile-heading h1,
+.profile-comment {
+  overflow-wrap: anywhere;
+}
+
+.profile-comment {
+  white-space: pre-wrap;
+}
+
+.profile-takes-link {
+  display: inline-block;
+  margin-top: 18px;
+  color: #c45208;
+  font-weight: 600;
+}
+
+.favorite-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  margin-top: 10px;
+  border: 1px solid #d5e1ec;
+  border-radius: 6px;
+  background: white;
+  color: #22447e;
+  cursor: pointer;
+}
+
+.favorite-button[aria-pressed="true"] {
+  color: #c45208;
+  border-color: #f97316;
+}
+
+.favorite-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
 
 #root {
   min-height: 100vh;
@@ -603,6 +679,17 @@ main {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+    position: relative;
+  }
+
+  .navbar .profile-link {
+    position: absolute;
+    top: 10px;
+    right: 24px;
+  }
+
+  .navbar .logo {
+    padding-right: 52px;
   }
 
   .nav-links {

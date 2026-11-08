@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { Flame } from "lucide-react";
+import { Flame, CircleUserRound } from "lucide-react";
 
 const categories = [
   { name: "Home", path: "/" },
@@ -31,6 +31,9 @@ export default function Navbar() {
             </NavLink>
           ))}
         </div>
+        <NavLink to="/profile" className="profile-link" aria-label="Your profile" title="Your profile">
+          <CircleUserRound size={28} aria-hidden="true" />
+        </NavLink>
       </nav>
     </header>
   );

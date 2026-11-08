@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import "../styles/login.css";
 
 function Signup() {
 
     const navigate = useNavigate();
+    const [params] = useSearchParams();
+    const destination = params.get("next") === "/profile" ? "/profile" : "/takes";
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -45,7 +47,7 @@ function Signup() {
                         : "Failed to create account.",
                 );
             }
-            navigate("/takes", { replace: true });
+            navigate(destination, { replace: true });
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to create account.");
         } finally {
@@ -94,7 +96,7 @@ function Signup() {
                     </button>
                 </form>
                 <p className="signup-login">
-                    Already have an account? <Link to="/login">Login</Link>
+                    Already have an account? <Link to={destination === "/profile" ? "/login?next=/profile" : "/login"}>Login</Link>
                 </p>
             </div>
         </main>

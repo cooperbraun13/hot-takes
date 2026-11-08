@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import MyTakes from "./pages/MyTakes";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Profile from "./pages/Profile";
 import MyLists from "./pages/MyLists";
 import GridGame from "./pages/GridGame";
 
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/lists" element={<MyLists />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/movies" element={<Home mediaType="movie" />} />
         <Route path="/tv" element={<Home mediaType="tv" />} />
         <Route path="/books" element={<Home mediaType="book" />} />
