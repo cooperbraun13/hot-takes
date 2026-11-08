@@ -1,15 +1,5 @@
-import CategoryCard from "../components/CategoryCard";
 import MediaCard from "../components/MediaCard";
-import type { Media, MediaCategory } from "../types";
-
-const categories: MediaCategory[] = [
-  { id: "movie", name: "Movies", icon: "🎬", path: "/movies", available: true },
-  { id: "tv", name: "TV", icon: "📺", path: "/tv", available: true },
-  { id: "book", name: "Books", icon: "📚", path: "/books", available: true },
-  { id: "music", name: "Music", icon: "🎵", path: "/music", available: true },
-  { id: "game", name: "Games", icon: "🎮", path: "/games", available: true },
-  { id: "podcast", name: "Podcasts", icon: "🎙️", path: "/podcasts", available: true },
-];
+import type { Media } from "../types";
 
 const media: Media[] = [
   {
@@ -47,22 +37,35 @@ const media: Media[] = [
 export default function Home() {
   return (
     <main>
-      <h1>Explore</h1>
-      <p>Discover your next favorite.</p>
-
-      <h2>Categories</h2>
-      <div className="category-grid">
-        {categories.map((category) => (
-          <CategoryCard key={category.path} category={category} />
-        ))}
+      <div className="page-header">
+        <h1>Discover what's trending.</h1>
+        <p>Movies, shows, books, music, games, and more.</p>
       </div>
 
-      <h2>Featured Media</h2>
-      <div className="media-grid">
-        {media.map((item) => (
-          <MediaCard key={item.id} media={item} />
-        ))}
-      </div>
+      <section className="media-section">
+        <h2>Trending This Week</h2>
+        <div className="media-grid">
+          {media.map((item) => (
+            <MediaCard key={item.id} media={item} />
+          ))}
+        </div>
+      </section>
+
+      <section className="media-banner">
+        <h2>Got a Hot Take?</h2>
+        <p>Rate what you love. Review what you hate.</p>
+      </section>
+
+      <section className="media-section">
+        <h2>Popular in Games</h2>
+        <div className="media-grid">
+          {media
+            .filter((item) => item.media_type === "game")
+            .map((item) => (
+              <MediaCard key={item.id} media={item} />
+            ))}
+        </div>
+      </section>
     </main>
   );
 }
