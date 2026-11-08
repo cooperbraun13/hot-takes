@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router";
 
 import MediaCard from "../components/MediaCard";
+import MediaSearch, { type MediaSelection } from "../components/MediaSearch";
 import type {
   MediaCategory,
   MediaType,
@@ -76,6 +77,13 @@ const categories: MediaCategory[] = [
     available: true,
   },
   {
+    id: "book",
+    name: "Books",
+    icon: "",
+    path: "/books",
+    available: true,
+  },
+  {
     id: "podcast",
     name: "Podcasts",
     icon: "🎙️",
@@ -92,8 +100,9 @@ function MyTakes() {
   const [needsLogin, setNeedsLogin] = useState(false);
   const [error, setError] = useState("");
   const [saveError, setSaveError] = useState("");
-  const [title, setTitle] = useState("");
-  const [externalId, setExternalId] = useState("");
+  const [category, setCategory] = useState<MediaType>("movie");
+  const [selectedMedia, setSelectedMedia] = useState<MediaSelection | null>(null);
+  const [searchVersion, setSearchVersion] = useState(0);
   const [rating, setRating] = useState(3);
   const [comment, setComment] = useState("");
 
@@ -128,8 +137,8 @@ function MyTakes() {
     event.preventDefault();
     if (saving) return;
     setSaveError("");
-    if (!title.trim() || !externalId.trim()) {
-      setSaveError("Enter a movie title and TMDB movie ID.");
+    if (!selectedMedia || selectedMedia.media_type !== category) {
+      setSaveError("Search for a title and select a matching result.");
       return;
     }
     setSaving(true);
@@ -139,11 +148,7 @@ function MyTakes() {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          media: {
-            media_type: "movie", external_source: "tmdb",
-            external_id: externalId.trim(), title: title.trim(),
-            year: null, cover_url: null,
-          },
+          media: selectedMedia,
           rating, comment: comment.trim() || null, watched_on: null,
         }),
       });
@@ -155,8 +160,8 @@ function MyTakes() {
       const saved: SavedTake = await response.json();
       setTakes((current) => [toTake(saved), ...current]);
       setSelectedType("all");
-      setTitle("");
-      setExternalId("");
+      setSelectedMedia(null);
+      setSearchVersion((current) => current + 1);
       setRating(3);
       setComment("");
     } catch (err) {
@@ -187,14 +192,23 @@ function MyTakes() {
       </div>
 
       <section className="media-section">
-        <h2>Rate a movie</h2>
+        <h2>Log a take</h2>
         <form className="take-form" onSubmit={handleSubmit}>
           <fieldset disabled={saving || Boolean(error)}>
             <legend>New take</legend>
-            <label htmlFor="movie-title">Movie title</label>
-            <input id="movie-title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            <label htmlFor="movie-id">TMDB movie ID</label>
-            <input id="movie-id" value={externalId} onChange={(e) => setExternalId(e.target.value)} placeholder="27205 for Inception" required />
+            <label htmlFor="take-category">Category</label>
+            <select id="take-category" value={category} onChange={(event) => {
+              setCategory(event.target.value as MediaType);
+              setSelectedMedia(null);
+              setSaveError("");
+            }}>
+              {categories.map((item) => (
+                <option key={item.id} value={item.id} disabled={item.id === "podcast"}>
+                  {item.name}{item.id === "podcast" ? " (coming soon)" : ""}
+                </option>
+              ))}
+            </select>
+            <MediaSearch key={`${category}-${searchVersion}`} category={category} value={selectedMedia} onChange={setSelectedMedia} />
             <label htmlFor="rating">Rating</label>
             <select id="rating" value={rating} onChange={(e) => setRating(Number(e.target.value))}>
               {Array.from({ length: 10 }, (_, i) => (i + 1) / 2).map((value) => (
@@ -203,7 +217,7 @@ function MyTakes() {
             </select>
             <label htmlFor="comment">Your take (optional)</label>
             <textarea id="comment" value={comment} onChange={(e) => setComment(e.target.value)} maxLength={2000} />
-            <button type="submit">{saving ? "Saving..." : "Save take"}</button>
+            <button type="submit" disabled={!selectedMedia}>{saving ? "Saving..." : "Save take"}</button>
           </fieldset>
           {saveError && <p role="alert">{saveError}</p>}
         </form>
