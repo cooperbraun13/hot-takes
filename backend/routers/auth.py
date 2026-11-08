@@ -22,6 +22,11 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
   return user
 
 
+@router.get("/me", response_model=UserOut)
+def current_user(user: User = Depends(get_current_user)):
+  return user
+
+
 @router.post("/register", response_model=UserOut, status_code=201)
 def register(body: UserCreate, request: Request, db: Session = Depends(get_db)):
   if db.query(User).filter_by(username=body.username).first():
