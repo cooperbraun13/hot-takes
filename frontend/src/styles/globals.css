@@ -166,6 +166,77 @@ main {
   color: #f97316;
 }
 
+/* My Takes */
+
+.my-takes-page .category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.my-takes-page .category-card {
+  padding: 24px 16px;
+  border: 1px solid #d5e1ec;
+  background: transparent;
+  color: #22447e;
+  cursor: pointer;
+  text-align: center;
+}
+
+.my-takes-page .category-card:hover {
+  border-color: #f97316;
+}
+
+.my-takes-page .category-icon {
+  font-size: 28px;
+}
+
+.my-takes-page .category-card p {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.my-takes-page .filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.my-takes-page .filter-row button {
+  padding: 8px 16px;
+  border: 1px solid #d5e1ec;
+  background: transparent;
+  color: #22447e;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.my-takes-page .filter-row button:hover {
+  border-color: #f97316;
+  color: #f97316;
+}
+
+.my-takes-page .filter-row button.active {
+  border-color: #22447e;
+  background: #22447e;
+  color: white;
+}
+
+.my-takes-page button:focus-visible {
+  outline: 2px solid #f97316;
+  outline-offset: 4px;
+}
+
+.takes-empty {
+  margin: 0;
+  padding: 28px;
+  border: 1px solid #d5e1ec;
+  color: #64748b;
+  font-size: 14px;
+}
+
 /* banner */
 
 .media-banner {

@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import MediaCard from "../components/MediaCard";
-import CategoryCard from "../components/CategoryCard";
 import type {
   MediaCategory,
   MediaType,
@@ -114,26 +113,18 @@ function MyTakes() {
 
   return (
     <main className="my-takes-page">
+      <div className="page-header">
+        <h1>My Takes</h1>
+        <p>Your ratings for movies, shows, music, games, and more.</p>
+      </div>
 
-      <section className="explore-section">
-        <h2>Explore Media</h2>
-
-        <div className="category-grid">
-          {categories.map((category) => (
-            <CategoryCard
-              key={category.id}
-              category={category}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section className="takes-section">
-        <h2>My Takes</h2>
+      <section className="media-section takes-section">
+        <h2>Your Ratings</h2>
 
         <div className="filter-row">
           <button
             className={selectedType === "all" ? "active" : ""}
+            aria-pressed={selectedType === "all"}
             onClick={() => setSelectedType("all")}
           >
             All
@@ -142,6 +133,7 @@ function MyTakes() {
           {categories.map((category) => (
             <button
               key={category.id}
+              aria-pressed={selectedType === category.id}
               className={
                 selectedType === category.id ? "active" : ""
               }
@@ -152,7 +144,7 @@ function MyTakes() {
           ))}
         </div>
 
-        <div className="takes-grid">
+        <div className="media-grid">
           {filteredTakes.map((take) => (
             <MediaCard
               key={take.id}
@@ -163,7 +155,7 @@ function MyTakes() {
         </div>
 
         {filteredTakes.length === 0 && (
-          <p>You haven't logged any takes in this category.</p>
+          <p className="takes-empty" role="status">You haven't logged any takes in this category.</p>
         )}
       </section>
 

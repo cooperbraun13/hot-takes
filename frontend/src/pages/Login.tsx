@@ -17,7 +17,7 @@ function Login() {
             return;
         }
         // Simulate a successful login
-        navigate("/my-takes");
+        navigate("/takes", { replace: true });
     }
     return (
         <main>
