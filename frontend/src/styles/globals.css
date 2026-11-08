@@ -119,6 +119,30 @@ button {
   font-weight: 600;
 }
 
+.profile-sign-out {
+  margin-top: 16px;
+  padding: 10px 20px;
+  border: 1px solid #22447e;
+  border-radius: 6px;
+  background: white;
+  color: #22447e;
+  cursor: pointer;
+}
+
+.profile-sign-out:hover {
+  background: #dce7f3;
+}
+
+.profile-sign-out:focus-visible {
+  outline: 2px solid #f97316;
+  outline-offset: 3px;
+}
+
+.profile-sign-out:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .favorite-button {
   display: inline-flex;
   align-items: center;
