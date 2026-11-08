@@ -78,7 +78,10 @@ export default function MediaCard({ media, rating }: MediaCardProps) {
   return (
     <button
       className="media-card"
-      onClick={() => navigate(`/media/${media.id}`)}
+      onClick={() => navigate(
+        `/media/${media.media_type}/${encodeURIComponent(media.external_source)}/${encodeURIComponent(media.external_id)}`,
+        { state: { media } },
+      )}
     >
       <div className="media-content">
         {coverUrl && failedImage !== coverUrl ? (
