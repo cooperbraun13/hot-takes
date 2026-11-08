@@ -13,7 +13,7 @@ from database import SessionLocal, engine, Base
 from models import Media
 from schemas import MediaCreate, MediaResponse, GridGuess
 from grid_game import CLUES, matches_clue, new_grid
-from routers import takes, auth, lists
+from routers import takes, auth, lists, favorites
 from starlette.middleware.sessions import SessionMiddleware
 import os
 from dotenv import load_dotenv
@@ -25,6 +25,7 @@ app = FastAPI()
 app.include_router(auth.router)
 app.include_router(takes.router)
 app.include_router(lists.router)
+app.include_router(favorites.router)
 
 # Login cookie. SECRET_KEY signs it so nobody can fake being another user.
 app.add_middleware(
