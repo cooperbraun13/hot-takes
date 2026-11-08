@@ -12,7 +12,6 @@ from database import SessionLocal, engine, Base
 from models import Media
 from schemas import MediaCreate, MediaResponse, GridGuess
 from grid_game import CLUES, matches_clue, new_grid
-from schemas import MediaCreate, MediaResponse
 from routers import takes, auth, lists
 from starlette.middleware.sessions import SessionMiddleware
 import os

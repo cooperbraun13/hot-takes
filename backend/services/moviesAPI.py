@@ -4,9 +4,7 @@ from xmlrpc import client
 import httpx
 from dotenv import load_dotenv
 
-
 load_dotenv()
-
 
 BASE = "https://api.themoviedb.org/3"
 IMG = "https://image.tmdb.org/t/p"
@@ -15,7 +13,6 @@ IMG = "https://image.tmdb.org/t/p"
 def _img(path, size="w500"):
    if path:
        return f"{IMG}/{size}{path}" if path else None
-
 
 # Makes the API request with parameters returns JSON if request fails throw error
 async def _get(path, **params):
@@ -41,7 +38,6 @@ async def search_movies(query: str):
         }
         for m in data["results"]
     ]
-
 
 #returns the videos youtube id based off of the movie id, we can use this to have the video on site
 async def get_movie(movie_id: str):
@@ -77,8 +73,24 @@ async def get_movie(movie_id: str):
        ],
        "source": "tmdb",
    }
-  
-   # Returns a list of TV shows that match the search
+
+async def get_movie_grid_facts(movie_id: str):
+    """Fetch the complete cast and movie metadata needed to check grid clues."""
+    movie = await _get(f"movie/{movie_id}", append_to_response="credits")
+    return {
+        "id": str(movie["id"]),
+        "title": movie["title"],
+        "release_date": movie.get("release_date") or "",
+        "genre_ids": {genre["id"] for genre in movie.get("genres", [])},
+        "cast_names": {member["name"].casefold() for member in movie.get("credits", {}).get("cast", [])},
+        "director_names": {
+            member["name"].casefold()
+            for member in movie.get("credits", {}).get("crew", [])
+            if member.get("job") == "Director"
+        },
+    }
+
+# Returns a list of TV shows that match the search
 async def search_tv(query: str):
     data = await _get("/search/tv", query=query)
     return [
@@ -94,9 +106,6 @@ async def search_tv(query: str):
         for s in data["results"]
     ]
 
-
-
-
 # Returns full details for one TV show, including the YouTube trailer key
 async def get_tv(tv_id: str):
    s = await _get(f"/tv/{tv_id}", append_to_response="credits,videos")
@@ -107,7 +116,6 @@ async def get_tv(tv_id: str):
         if v["site"] == "YouTube" and v["type"] == "Trailer"),
        None,
    )
-
 
    return {
        "external_id": str(s["id"]),
@@ -146,9 +154,6 @@ async def get_tv(tv_id: str):
        ],
        "source": "tmdb",
    }
-
-
-
 
 # Returns the episode list for one season of a show
 async def get_season(tv_id: str, season_number: int):
