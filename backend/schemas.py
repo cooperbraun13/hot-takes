@@ -9,6 +9,11 @@ class MediaCreate(BaseModel):
 
 class MediaResponse(MediaCreate):
   id: int
-  
+
   model_config = {"from_attributes": True}
-  
+
+
+class GridGuess(BaseModel):
+  movie_id: str
+  row_id: str
+  column_id: str
