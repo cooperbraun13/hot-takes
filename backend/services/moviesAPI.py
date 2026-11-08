@@ -19,11 +19,11 @@ def _img(path, size="w500"):
 
 # Makes the API request with parameters returns JSON if request fails throw error
 async def _get(path, **params):
-   params["api_key"] = os.getenv("MOVIES_TV")
-   async with httpx.AsyncClient() as client:
-       res = await client.get(f"{BASE}/{path.lstrip('/')}", params=params)
-       res.raise_for_status()
-       return res.json()
+    params["api_key"] = os.getenv("MOVIES_TV")
+    async with httpx.AsyncClient() as client:
+        res = await client.get(f"{BASE}/{path.lstrip('/')}", params=params)
+        res.raise_for_status()
+        return res.json()
   
 # Returns a list of movies that match the entry
 async def search_movies(query: str):

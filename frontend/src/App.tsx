@@ -13,6 +13,7 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/grid" element={<GridGame />} />
         <Route path="/takes" element={<MyTakes />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />

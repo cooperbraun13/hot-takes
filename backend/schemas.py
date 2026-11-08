@@ -18,6 +18,13 @@ class MediaResponse(MediaCreate):
   model_config = {"from_attributes": True}
 
 
+class GridGuess(BaseModel):
+  movie_id: str
+  row_id: str
+  column_id: str
+  model_config = {"from_attributes": True}
+
+
 # ---------- MVP schemas ----------
 # "In" = JSON the frontend sends us. "Out" = JSON we send back.
 # Out shapes match Sam's frontend/src/types/index.tsx.
