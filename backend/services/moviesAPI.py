@@ -80,6 +80,11 @@ async def get_movie_grid_facts(movie_id: str):
     "release_date": movie.get("release_date") or "",
     "genre_ids": {genre["id"] for genre in movie.get("genres", [])},
     "cast_names": {member["name"].casefold() for member in movie.get("credits", {}).get("cast", [])},
+    "director_names": {
+      member["name"].casefold()
+      for member in movie.get("credits", {}).get("crew", [])
+      if member.get("job") == "Director"
+    },
   }
     
 # Returns a list of TV shows that match the search
