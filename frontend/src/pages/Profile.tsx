@@ -30,6 +30,25 @@ export default function Profile() {
   const [actionError, setActionError] = useState("");
   const [pending, setPending] = useState<number | null>(null);
   const [retry, setRetry] = useState(0);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
+
+  async function signOut() {
+    if (signingOut || pending !== null) return;
+    setSigningOut(true);
+    setSignOutError("");
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST", credentials: "include",
+      });
+      if (!response.ok) throw new Error("Could not sign out. Please try again.");
+      navigate("/login", { replace: true });
+    } catch (err) {
+      setSignOutError(err instanceof Error ? err.message : "Could not sign out.");
+    } finally {
+      setSigningOut(false);
+    }
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -63,7 +82,7 @@ export default function Profile() {
   }, [navigate, retry]);
 
   async function toggleFavorite(media: StoredMedia) {
-    if (pending !== null) return;
+    if (pending !== null || signingOut) return;
     const isFavorite = favorites.some((item) => item.id === media.id);
     setPending(media.id);
     setActionError("");
@@ -87,7 +106,7 @@ export default function Profile() {
   function favoriteButton(media: StoredMedia) {
     const isFavorite = favorites.some((item) => item.id === media.id);
     return (
-      <button className="favorite-button" type="button" disabled={pending !== null}
+      <button className="favorite-button" type="button" disabled={pending !== null || signingOut}
         aria-pressed={isFavorite} aria-label={`${isFavorite ? "Remove" : "Add"} ${media.title} ${isFavorite ? "from" : "to"} favorites`}
         onClick={() => void toggleFavorite(media)}>
         <Heart size={16} fill={isFavorite ? "currentColor" : "none"} aria-hidden="true" />
@@ -106,6 +125,12 @@ export default function Profile() {
         <h1>{username}</h1>
         <p>Your favorites and latest takes, all in one place.</p>
         <Link className="profile-takes-link" to="/takes">Log a take</Link>
+        <div>
+          <button className="profile-sign-out" type="button" onClick={() => void signOut()} disabled={signingOut || pending !== null}>
+            {signingOut ? "Signing out..." : "Sign out"}
+          </button>
+        </div>
+        {signOutError && <p role="alert">{signOutError}</p>}
       </div>
       {actionError && <p role="alert">{actionError}</p>}
       <section className="media-section" aria-labelledby="favorites-heading">
