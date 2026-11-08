@@ -30,6 +30,7 @@ class User(Base):
   username = Column(String, unique=True, nullable=False, index=True)
   password_hash = Column(String, nullable=False)   # bcrypt hash, never the real password
   failed_login_attempts = Column(Integer, nullable=False, default=0)
+  last_failed_login_at = Column(DateTime)
   created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
   takes = relationship("Take", back_populates="user")

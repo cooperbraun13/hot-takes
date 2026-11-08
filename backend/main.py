@@ -11,9 +11,24 @@ from sqlalchemy import text
 from database import SessionLocal, engine, Base
 from models import Media
 from schemas import MediaCreate, MediaResponse
+from routers import takes, auth
+from starlette.middleware.sessions import SessionMiddleware
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 app = FastAPI()
+app.include_router(auth.router)
+app.include_router(takes.router)
+
+# Login cookie. SECRET_KEY signs it so nobody can fake being another user.
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SECRET_KEY", "dev-only-change-me"),
+    same_site="lax",
+)
 
 app.add_middleware(
     CORSMiddleware,

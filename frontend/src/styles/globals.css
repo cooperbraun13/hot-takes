@@ -229,6 +229,43 @@ main {
   outline-offset: 4px;
 }
 
+.take-form {
+  max-width: 560px;
+}
+
+.take-form fieldset {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid #d5e1ec;
+}
+
+.take-form input,
+.take-form select,
+.take-form textarea,
+.take-form button {
+  padding: 10px;
+  font: inherit;
+  min-width: 0;
+}
+
+.take-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.take-form button {
+  background: #22447e;
+  color: white;
+  border: 0;
+  cursor: pointer;
+}
+
+.take-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .takes-empty {
   margin: 0;
   padding: 28px;

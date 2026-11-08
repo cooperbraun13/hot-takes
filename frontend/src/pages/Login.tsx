@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import "../styles/login.css";
+async function responseError(response: Response): Promise<string> {
+  const body = await response.json().catch(() => null);
+  return typeof body?.detail === "string"
+    ? body.detail
+    : `Request failed (${response.status}).`;
+}
 
 
 function Login() {
@@ -8,16 +14,31 @@ function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        if (loading) return;
         setError("");
         if (!username.trim() || !password.trim()) {
             setError("Please fill in all fields.");
             return;
         }
-        // Simulate a successful login
-        navigate("/takes", { replace: true });
+        setLoading(true);
+        try {
+            const response = await fetch("/api/auth/login", {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username: username.trim(), password }),
+            });
+            if (!response.ok) throw new Error(await responseError(response));
+            navigate("/takes", { replace: true });
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Login failed.");
+        } finally {
+            setLoading(false);
+        }
     }
     return (
         <main>
@@ -42,7 +63,7 @@ function Login() {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     {error && <p className="login-error">{error}</p>}
-                    <button type="submit">Login</button>
+                    <button type="submit" disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
                 </form>
                 <p className="login-signup">
                     Don't have an account? <Link to="/signup">Sign Up</Link>
