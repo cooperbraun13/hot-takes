@@ -25,8 +25,9 @@ Media type: **movies only**, via TMDB.
 2. Search for a movie and open its movie page
 3. Log a movie from its movie page with a score (0.5–5, half-star steps) and a comment
 4. "My movies" page listing what you've logged — the landing page after login
+5. A 3×3 movie Grid Game with actors, directors, genres, release periods, and title-letter ranges randomized across both rows and columns. A curated film list is used to choose boards with nine distinct candidate answers; title guesses are checked with TMDB. The player does not need to specify a year: matching versions are checked against the cell, and one submitted title uses at most one wrong guess. Refreshing or starting a new grid resets the round.
 
-**Not in the MVP:** follows and friend feed, full profile page, other media types, the game scores/history feature, deployment.
+**Not in the MVP:** follows and friend feed, full profile page, other media types, stored game scores/history, deployment.
 Do not build these until the MVP works end to end.
 
 ## Decisions
@@ -117,7 +118,7 @@ Post-MVP: `follows`, `catalogs`, `catalog_items`, game scores/history (undefined
 
 ```
 DATABASE_URL=sqlite:///./hottakes.db
-TMDB_API_KEY=
+MOVIES_TV=
 MUSIC_API_KEY=
 GAMES_API_KEY=
 ```
