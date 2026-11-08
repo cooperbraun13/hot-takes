@@ -26,19 +26,23 @@ export default function MediaCard({ media, rating }: MediaCardProps) {
     coverUrl: string | null;
   } | null>(null);
   const [failedImage, setFailedImage] = useState<string | null>(null);
+  const displayAlbum = media.media_type === "music" && media.extra?.displayAs === "album";
   const mediaKey = JSON.stringify([
-    media.media_type, media.external_source, media.external_id,
+    media.media_type, media.external_source, media.external_id, displayAlbum,
   ]);
 
   useEffect(() => {
+    // Discovery responses already contain the title and cover.
+    if (media.extra?.discovery) return;
     const isMovie = media.media_type === "movie" && media.external_source === "tmdb";
     const isTv = media.media_type === "tv" && media.external_source === "tmdb";
     const isGame = media.media_type === "game" && media.external_source === "twitch";
     const isBook = media.media_type === "book" && media.external_source === "local";
-    if (!isMovie && !isTv && !isGame && !isBook) return;
+    const isMusic = media.media_type === "music" && media.external_source === "spotify";
+    if (!isMovie && !isTv && !isGame && !isBook && !isMusic) return;
 
     const controller = new AbortController();
-    const endpoint = isBook ? "books" : isGame ? "games" : isTv ? "tv" : "movies";
+    const endpoint = isBook ? "books" : isMusic ? "music" : isGame ? "games" : isTv ? "tv" : "movies";
     async function loadMedia() {
       try {
         const response = await fetch(
@@ -50,8 +54,8 @@ export default function MediaCard({ media, rating }: MediaCardProps) {
         if (!controller.signal.aborted) {
           setDetails({
             key: mediaKey,
-            title: data.title || media.title,
-            coverUrl: (isBook ? data.cover_url : isGame ? data.imageUrl : data.posterUrl) || null,
+            title: (displayAlbum ? data.album : data.title) || media.title,
+            coverUrl: (isBook ? data.cover_url : isGame || isMusic ? data.imageUrl : data.posterUrl) || null,
           });
         }
       } catch {
@@ -60,7 +64,7 @@ export default function MediaCard({ media, rating }: MediaCardProps) {
     }
     void loadMedia();
     return () => controller.abort();
-  }, [mediaKey, media.media_type, media.external_source, media.external_id, media.title]);
+  }, [mediaKey, media.media_type, media.external_source, media.external_id, media.title, displayAlbum, media.extra?.discovery]);
 
   const currentDetails = details?.key === mediaKey ? details : null;
   const title = currentDetails?.title ?? media.title;
@@ -91,7 +95,7 @@ export default function MediaCard({ media, rating }: MediaCardProps) {
         )}
 
         <h3>{title}</h3>
-        <p>{media.media_type}</p>
+        <p>{displayAlbum ? "Music album" : media.media_type}</p>
 
         {rating !== undefined && <p className="media-rating">★ {rating}/5</p>}
       </div>

@@ -16,11 +16,11 @@ export default function App() {
         <Route path="/takes" element={<MyTakes />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/movies" element={<Home />} />
-        <Route path="/tv" element={<Home />} />
-        <Route path="/books" element={<Home />} />
-        <Route path="/music" element={<Home />} />
-        <Route path="/games" element={<Home />} />
+        <Route path="/movies" element={<Home mediaType="movie" />} />
+        <Route path="/tv" element={<Home mediaType="tv" />} />
+        <Route path="/books" element={<Home mediaType="book" />} />
+        <Route path="/music" element={<Home mediaType="music" />} />
+        <Route path="/games" element={<Home mediaType="game" />} />
       </Routes>
 
       <Footer />

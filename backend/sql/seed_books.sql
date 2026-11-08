@@ -16,7 +16,11 @@ VALUES
     ('animal-farm', 'Animal Farm', 'George Orwell', 1945,
      'A political fable about a revolution on a farm.', NULL),
     ('pride-and-prejudice', 'Pride and Prejudice', 'Jane Austen', 1813,
-     'A novel about love, social class, and first impressions.', NULL)
+     'A novel about love, social class, and first impressions.', NULL),
+    ('the-hobbit', 'The Hobbit', 'J. R. R. Tolkien', 1937,
+     'Bilbo Baggins joins a company of dwarves on a quest to reclaim their home.', NULL),
+    ('the-great-gatsby', 'The Great Gatsby', 'F. Scott Fitzgerald', 1925,
+     'A story of wealth, longing, and the American dream in the Jazz Age.', NULL)
 ON CONFLICT(id) DO NOTHING;
 COMMIT;
 
