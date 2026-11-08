@@ -8,27 +8,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from database import get_db
+from routers.auth import get_current_user
 from models import MediaItem, Take, User
 from schemas import TakeCreate, TakeOut
 
 router = APIRouter(prefix="/api", tags=["takes"])
-
-
-# ---------------------------------------------------------------------------
-# TEMPORARY: no login yet, so everyone is "user 1".
-# When auth is built, replace this function with one that reads the logged-in
-# user from the session. Nothing else in this file has to change.
-# ---------------------------------------------------------------------------
-FAKE_USER_ID = 1
-
-def get_current_user(db: Session = Depends(get_db)) -> User:
-  user = db.get(User, FAKE_USER_ID)
-  if user is None:
-    user = User(id=FAKE_USER_ID, username="demo", password_hash="not-a-real-hash")
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-  return user
 
 
 def get_or_create_media_item(db: Session, data) -> MediaItem:

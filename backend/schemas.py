@@ -25,9 +25,9 @@ class MediaResponse(MediaCreate):
 # --- Users / auth ---
 
 class UserCreate(BaseModel):
-  """Body for POST /auth/signup and POST /auth/login."""
-  username: str = Field(min_length=3, max_length=30)
-  password: str = Field(min_length=8, max_length=72)   # bcrypt's limit is 72 bytes
+  """Body for register and login."""
+  username: str
+  password: str
 
 
 class UserOut(BaseModel):
