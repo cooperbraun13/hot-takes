@@ -1,5 +1,5 @@
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router";
 
 import MediaCard from "../components/MediaCard";
@@ -94,6 +94,8 @@ const categories: MediaCategory[] = [
 
 
 function MyTakes() {
+  const [formOpen, setFormOpen] = useState(false);
+  const formToggle = useRef<HTMLButtonElement>(null);
   const [takes, setTakes] = useState<Take[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -164,6 +166,8 @@ function MyTakes() {
       setSearchVersion((current) => current + 1);
       setRating(3);
       setComment("");
+      setFormOpen(false);
+      formToggle.current?.focus();
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : "Could not save your take.");
     } finally {
@@ -192,7 +196,18 @@ function MyTakes() {
       </div>
 
       <section className="media-section">
-        <h2>Log a take</h2>
+        <button
+          ref={formToggle}
+          type="button"
+          className="log-take-toggle"
+          aria-expanded={formOpen}
+          aria-controls="log-take-options"
+          disabled={saving}
+          onClick={() => setFormOpen((open) => !open)}
+        >
+          {formOpen ? "− Close Log a Take" : "+ Log a Take"}
+        </button>
+        <div id="log-take-options" hidden={!formOpen}>
         <form className="take-form" onSubmit={handleSubmit}>
           <fieldset disabled={saving || Boolean(error)}>
             <legend>New take</legend>
@@ -221,6 +236,7 @@ function MyTakes() {
           </fieldset>
           {saveError && <p role="alert">{saveError}</p>}
         </form>
+        </div>
       </section>
 
       <section className="media-section takes-section">

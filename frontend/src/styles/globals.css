@@ -305,6 +305,34 @@ main {
   outline-offset: 4px;
 }
 
+/* Expandable Log a Take form */
+.my-takes-page .log-take-toggle {
+  display: block;
+  width: 100%;
+  padding: 24px;
+  border: none;
+  border-radius: 8px;
+  background: #f97316;
+  color: #172b4d;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.my-takes-page .log-take-toggle:hover {
+  background: #fb923c;
+}
+
+.my-takes-page .log-take-toggle:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.my-takes-page #log-take-options {
+  margin-top: 20px;
+}
+
 .take-form {
   max-width: 560px;
 }
