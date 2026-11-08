@@ -5,6 +5,7 @@ import httpx
 from services import moviesAPI as tmdb
 from services import musicAPI
 from services import gamesAPI
+from services import booksAPI
 from services.discovery import discover, media_item
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -163,20 +164,29 @@ async def discover_media(
     limit: int = Query(default=4, ge=1, le=10),
     db: Session = Depends(get_db),
 ):
-    if media_type == "book":
-        books = db.execute(text(
-            "SELECT id, title, year, description, cover_url FROM books ORDER BY rowid LIMIT :limit"
-        ), {"limit": limit}).mappings().all()
-        return [media_item("book", "local", b["id"], b["title"], b["cover_url"],
-                           b["year"], b["description"]) for b in books]
     try:
         return await discover(media_type, limit)
     except httpx.HTTPError:
         raise HTTPException(status_code=502, detail="Could not load media from the upstream API")
 
 # Books are populated with sql/seed_books.sql.
+@app.get("/api/search/books")
+async def search_books(q: str = Query(min_length=2, max_length=200)):
+  try:
+    return await booksAPI.search_books(q)
+  except httpx.HTTPError:
+    raise HTTPException(status_code=502, detail="Could not search Open Library")
+
 @app.get("/api/books/{book_id}")
-def book_details(book_id: str, db: Session = Depends(get_db)):
+async def book_details(book_id: str, db: Session = Depends(get_db)):
+  if book_id.startswith("OL") and book_id.endswith("W"):
+    try:
+      return await booksAPI.get_book(book_id)
+    except httpx.HTTPStatusError as error:
+      raise HTTPException(status_code=404 if error.response.status_code == 404 else 502,
+                          detail="Could not load book from Open Library")
+    except httpx.HTTPError:
+      raise HTTPException(status_code=502, detail="Could not load book from Open Library")
   book = db.execute(
     text("SELECT id, title, author, year, description, cover_url FROM books WHERE id = :id"),
     {"id": book_id},

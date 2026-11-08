@@ -15,6 +15,7 @@ interface SearchResult {
   external_id?: string;
   title: string;
   year?: string | number | null;
+  firstPublishYear?: number | null;
   cover_url?: string | null;
   cover_Url?: string | null;
   imageUrl?: string | null;
@@ -26,7 +27,7 @@ const endpoints: Partial<Record<MediaType, string>> = {
 };
 
 const sources: Partial<Record<MediaType, string>> = {
-  movie: "tmdb", tv: "tmdb", music: "spotify", game: "twitch", book: "local",
+  movie: "tmdb", tv: "tmdb", music: "spotify", game: "twitch", book: "openlibrary",
 };
 
 export default function MediaSearch({ category, value, onChange }: {
@@ -92,7 +93,7 @@ export default function MediaSearch({ category, value, onChange }: {
           {current?.items.map((item) => (
             <li key={item.external_id ?? item.id}>
               <button type="button" onClick={() => {
-                const year = item.year ? Number(item.year) : null;
+                const year = Number(item.year ?? item.firstPublishYear) || null;
                 onChange({
                   media_type: category,
                   external_source: sources[category]!,
