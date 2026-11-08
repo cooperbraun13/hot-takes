@@ -647,3 +647,15 @@ main {
     min-height: 96px;
   }
 }
+
+.my-lists-page .take-form { margin-bottom: 24px; }
+.list-remove {
+  margin-top: 12px;
+  padding: 8px 16px;
+  border: 1px solid #d5e1ec;
+  background: transparent;
+  color: #22447e;
+  cursor: pointer;
+}
+.list-remove:hover { border-color: #f97316; color: #f97316; }
+.my-lists-page button:disabled { opacity: 0.6; cursor: default; }
