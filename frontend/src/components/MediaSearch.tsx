@@ -16,6 +16,7 @@ interface SearchResult {
   title: string;
   year?: string | number | null;
   cover_url?: string | null;
+  cover_Url?: string | null;
   imageUrl?: string | null;
   subtitle?: string;
 }
@@ -98,7 +99,7 @@ export default function MediaSearch({ category, value, onChange }: {
                   external_id: String(item.external_id ?? item.id),
                   title: item.title,
                   year: year && Number.isFinite(year) ? year : null,
-                  cover_url: item.cover_url ?? item.imageUrl ?? null,
+                  cover_url: item.cover_url ?? item.cover_Url ?? item.imageUrl ?? null,
                 });
                 setQuery(item.title);
               }}>

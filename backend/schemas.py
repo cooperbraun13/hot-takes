@@ -95,3 +95,21 @@ class TakeOut(BaseModel):
   created_at: datetime
 
   model_config = {"from_attributes": True}
+
+
+class ListCreate(BaseModel):
+  name: str = Field(min_length=1, max_length=100)
+
+
+class ListEntryOut(BaseModel):
+  id: int
+  media: MediaItemOut = Field(validation_alias="media_item")
+  model_config = {"from_attributes": True}
+
+
+class ListOut(BaseModel):
+  id: int
+  name: str
+  created_at: datetime
+  entries: list[ListEntryOut]
+  model_config = {"from_attributes": True}
