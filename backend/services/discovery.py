@@ -1,6 +1,6 @@
 """Small live discovery lists using the existing authenticated API clients."""
 from datetime import datetime, timezone
-from services import moviesAPI, gamesAPI, musicAPI
+from services import moviesAPI, gamesAPI, musicAPI, booksAPI
 
 
 def media_item(kind, source, external_id, title, cover_url=None, year=None, description=""):
@@ -13,6 +13,10 @@ def media_item(kind, source, external_id, title, cover_url=None, year=None, desc
 
 
 async def discover(kind, limit):
+    if kind == "book":
+        books = await booksAPI.trending_books(limit)
+        return [media_item(kind, "openlibrary", b["id"], b["title"], b["imageUrl"], b["year"])
+                for b in books]
     if kind in ("movie", "tv"):
         data = await moviesAPI._get(f"{kind}/popular")
         return [media_item(

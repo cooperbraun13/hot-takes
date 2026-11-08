@@ -37,7 +37,7 @@ export default function MediaCard({ media, rating }: MediaCardProps) {
     const isMovie = media.media_type === "movie" && media.external_source === "tmdb";
     const isTv = media.media_type === "tv" && media.external_source === "tmdb";
     const isGame = media.media_type === "game" && media.external_source === "twitch";
-    const isBook = media.media_type === "book" && media.external_source === "local";
+    const isBook = media.media_type === "book" && ["local", "openlibrary"].includes(media.external_source);
     const isMusic = media.media_type === "music" && media.external_source === "spotify";
     if (!isMovie && !isTv && !isGame && !isBook && !isMusic) return;
 
@@ -55,7 +55,7 @@ export default function MediaCard({ media, rating }: MediaCardProps) {
           setDetails({
             key: mediaKey,
             title: (displayAlbum ? data.album : data.title) || media.title,
-            coverUrl: (isBook ? data.cover_url : isGame || isMusic ? data.imageUrl : data.posterUrl) || null,
+            coverUrl: (isBook ? data.cover_url ?? data.imageUrl : isGame || isMusic ? data.imageUrl : data.posterUrl) || null,
           });
         }
       } catch {
