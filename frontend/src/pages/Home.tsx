@@ -15,7 +15,7 @@ export default function Home({ mediaType }: { mediaType?: MediaType }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    const types: MediaType[] = mediaType ? [mediaType] : ["movie", "tv", "music", "book", "game"];
+    const types: MediaType[] = mediaType ? [mediaType] : ["movie", "tv", "music", "game"];
     async function loadMedia() {
       const responses = await Promise.allSettled(types.map(async (type) => {
         const response = await fetch(`/api/discover/${type}?limit=4`, {
@@ -28,7 +28,17 @@ export default function Home({ mediaType }: { mediaType?: MediaType }) {
       const items: Media[] = [];
       const errors: string[] = [];
       responses.forEach((response, index) => {
-        if (response.status === "fulfilled") items.push(...response.value);
+        if (response.status === "fulfilled") {
+          const entries = [...response.value];
+          if (!mediaType && types[index] === "music") {
+            // Shuffle once per load so Home picks distinct random music cards.
+            for (let i = entries.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [entries[i], entries[j]] = [entries[j], entries[i]];
+            }
+          }
+          items.push(...entries);
+        }
         else errors.push(`Could not load ${categoryLabels[types[index]].toLowerCase()}. Please try refreshing.`);
       });
       setResult({ key: requestKey, items, errors });
@@ -41,8 +51,8 @@ export default function Home({ mediaType }: { mediaType?: MediaType }) {
   const loading = !current;
   const items = current?.items ?? [];
   const category = mediaType ? categoryLabels[mediaType] : null;
-  const visibleMedia = mediaType ? items : ["movie", "tv", "music", "book"].flatMap(
-    (type) => items.filter((item) => item.media_type === type).slice(0, 1),
+  const visibleMedia = mediaType ? items : ["movie", "tv", "music"].flatMap(
+    (type) => items.filter((item) => item.media_type === type).slice(0, type === "music" ? 2 : 1),
   );
 
   return (
