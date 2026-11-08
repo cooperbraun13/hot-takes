@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import "../styles/login.css";
 async function responseError(response: Response): Promise<string> {
   const body = await response.json().catch(() => null);
@@ -11,6 +11,8 @@ async function responseError(response: Response): Promise<string> {
 
 function Login() {
     const navigate = useNavigate();
+    const [params] = useSearchParams();
+    const destination = params.get("next") === "/profile" ? "/profile" : "/takes";
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -33,7 +35,7 @@ function Login() {
                 body: JSON.stringify({ username: username.trim(), password }),
             });
             if (!response.ok) throw new Error(await responseError(response));
-            navigate("/takes", { replace: true });
+            navigate(destination, { replace: true });
         } catch (err) {
             setError(err instanceof Error ? err.message : "Login failed.");
         } finally {
@@ -66,7 +68,7 @@ function Login() {
                     <button type="submit" disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
                 </form>
                 <p className="login-signup">
-                    Don't have an account? <Link to="/signup">Sign Up</Link>
+                    Don't have an account? <Link to={destination === "/profile" ? "/signup?next=/profile" : "/signup"}>Sign Up</Link>
                 </p>
             </div>
         </main>
