@@ -73,3 +73,21 @@ class Take(Base):
 
   user = relationship("User", back_populates="takes")
   media_item = relationship("MediaItem", back_populates="takes")
+
+
+class MediaList(Base):
+  __tablename__ = "media_lists"
+  id = Column(Integer, primary_key=True)
+  user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+  name = Column(String(100), nullable=False)
+  created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+  entries = relationship("ListEntry", cascade="all, delete-orphan", order_by="ListEntry.id")
+
+
+class ListEntry(Base):
+  __tablename__ = "list_entries"
+  __table_args__ = (UniqueConstraint("list_id", "media_item_id", name="uq_list_media"),)
+  id = Column(Integer, primary_key=True)
+  list_id = Column(Integer, ForeignKey("media_lists.id"), nullable=False, index=True)
+  media_item_id = Column(Integer, ForeignKey("media_items.id"), nullable=False)
+  media_item = relationship("MediaItem")
