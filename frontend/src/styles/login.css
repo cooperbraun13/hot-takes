@@ -1,0 +1,75 @@
+
+/* login */
+
+.login-container,
+.signup-container {
+  max-width: 400px;
+  margin: 60px auto;
+}
+
+.login-form,
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-form label,
+.signup-form label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.login-form input,
+.signup-form input {
+  padding: 12px;
+  border: 1px solid #d5e1ec;
+  font: inherit;
+}
+
+.login-form input:focus,
+.signup-form input:focus {
+  outline: 1px solid #22447e;
+}
+
+.login-form button,
+.signup-form button {
+  padding: 12px;
+  background: #f97316;
+  color: white;
+  border: none;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.login-form button:hover,
+.signup-form button:hover {
+  background: #ea580c;
+}
+
+.login-error,
+.signup-error {
+  color: #dc2626;
+  font-size: 13px;
+}
+
+.login-signup,
+.signup-login {
+  text-align: center;
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+.login-signup a,
+.signup-login a {
+  color: #f97316;
+  font-weight: 600;
+}
+
+.login-form button:disabled,
+.signup-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}

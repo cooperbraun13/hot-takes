@@ -1,17 +1,36 @@
-from fastapi import FastAPI, Depends,HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
+from typing import Literal
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from services import moviesAPI as tmdb
 from services import musicAPI
 from services import gamesAPI
+from services.discovery import discover, media_item
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from database import SessionLocal, engine, Base
 from models import Media
 from schemas import MediaCreate, MediaResponse, GridGuess
 from grid_game import CLUES, matches_clue, new_grid
+from schemas import MediaCreate, MediaResponse
+from routers import takes, auth
+from starlette.middleware.sessions import SessionMiddleware
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 app = FastAPI()
+app.include_router(auth.router)
+app.include_router(takes.router)
+
+# Login cookie. SECRET_KEY signs it so nobody can fake being another user.
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SECRET_KEY", "dev-only-change-me"),
+    same_site="lax",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -137,6 +156,34 @@ Base.metadata.create_all(bind=engine)
 def get_db():
   with SessionLocal() as db:
     yield db
+
+@app.get("/api/discover/{media_type}")
+async def discover_media(
+    media_type: Literal["movie", "tv", "game", "music", "book"],
+    limit: int = Query(default=4, ge=1, le=10),
+    db: Session = Depends(get_db),
+):
+    if media_type == "book":
+        books = db.execute(text(
+            "SELECT id, title, year, description, cover_url FROM books ORDER BY rowid LIMIT :limit"
+        ), {"limit": limit}).mappings().all()
+        return [media_item("book", "local", b["id"], b["title"], b["cover_url"],
+                           b["year"], b["description"]) for b in books]
+    try:
+        return await discover(media_type, limit)
+    except httpx.HTTPError:
+        raise HTTPException(status_code=502, detail="Could not load media from the upstream API")
+
+# Books are populated with sql/seed_books.sql.
+@app.get("/api/books/{book_id}")
+def book_details(book_id: str, db: Session = Depends(get_db)):
+  book = db.execute(
+    text("SELECT id, title, author, year, description, cover_url FROM books WHERE id = :id"),
+    {"id": book_id},
+  ).mappings().first()
+  if book is None:
+    raise HTTPException(status_code=404, detail="Book not found")
+  return dict(book)
     
 # get all media
 @app.get("/app/media", response_model=list[MediaResponse])

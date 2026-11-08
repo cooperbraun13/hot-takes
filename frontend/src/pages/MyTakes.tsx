@@ -1,14 +1,51 @@
 
-import { useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { Link } from "react-router";
+
 import MediaCard from "../components/MediaCard";
-import CategoryCard from "../components/CategoryCard";
+import MediaSearch, { type MediaSelection } from "../components/MediaSearch";
 import type {
   MediaCategory,
   MediaType,
   Take,
 } from "../types";
 
-import "../styles/MyTakes.css";
+import "../styles/globals.css";
+
+interface SavedTake {
+  id: number;
+  media: Omit<Take["media"], "id" | "description" | "extra"> & {
+    id: number;
+    description: string | null;
+    extra: Record<string, unknown> | null;
+  };
+  rating: number;
+  comment: string | null;
+  watched_on: string | null;
+  created_at: string;
+}
+
+async function responseError(response: Response): Promise<string> {
+  const body = await response.json().catch(() => null);
+  return typeof body?.detail === "string"
+    ? body.detail
+    : `Request failed (${response.status}).`;
+}
+
+// Keep the existing card types while adapting the database response.
+function toTake(saved: SavedTake): Take {
+  return {
+    ...saved,
+    id: String(saved.id),
+    comment: saved.comment ?? "",
+    media: {
+      ...saved.media,
+      id: String(saved.media.id),
+      description: saved.media.description ?? "",
+      extra: saved.media.extra ?? undefined,
+    },
+  };
+}
 
 const categories: MediaCategory[] = [
   {
@@ -40,6 +77,13 @@ const categories: MediaCategory[] = [
     available: true,
   },
   {
+    id: "book",
+    name: "Books",
+    icon: "",
+    path: "/books",
+    available: true,
+  },
+  {
     id: "podcast",
     name: "Podcasts",
     icon: "🎙️",
@@ -48,59 +92,84 @@ const categories: MediaCategory[] = [
   },
 ];
 
-const mockTakes: Take[] = [
-  {
-    id: "1",
-    media: {
-      id: "1",
-      media_type: "movie",
-      external_source: "tmdb",
-      external_id: "27205",
-      title: "Inception",
-      year: 2010,
-      cover_url: null,
-      description: "A science fiction movie.",
-    },
-    rating: 4.5,
-    comment: "Really good movie.",
-    created_at: "2026-11-07",
-  },
-  {
-    id: "2",
-    media: {
-      id: "2",
-      media_type: "music",
-      external_source: "spotify",
-      external_id: "example-album",
-      title: "Example Album",
-      year: 2024,
-      cover_url: null,
-      description: "A sample album.",
-    },
-    rating: 5,
-    comment: "Great album.",
-    created_at: "2026-11-07",
-  },
-  {
-    id: "3",
-    media: {
-      id: "3",
-      media_type: "game",
-      external_source: "igdb",
-      external_id: "example-game",
-      title: "Example Game",
-      year: 2023,
-      cover_url: null,
-      description: "A sample game.",
-    },
-    rating: 4,
-    comment: "Fun gameplay.",
-    created_at: "2026-11-07",
-  },
-];
 
 function MyTakes() {
-  const [takes] = useState<Take[]>(mockTakes);
+  const [takes, setTakes] = useState<Take[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [needsLogin, setNeedsLogin] = useState(false);
+  const [error, setError] = useState("");
+  const [saveError, setSaveError] = useState("");
+  const [category, setCategory] = useState<MediaType>("movie");
+  const [selectedMedia, setSelectedMedia] = useState<MediaSelection | null>(null);
+  const [searchVersion, setSearchVersion] = useState(0);
+  const [rating, setRating] = useState(3);
+  const [comment, setComment] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadTakes() {
+      try {
+        const response = await fetch("/api/me/takes", {
+          credentials: "include",
+          signal: controller.signal,
+        });
+        if (response.status === 401) {
+          setNeedsLogin(true);
+          return;
+        }
+        if (!response.ok) throw new Error(await responseError(response));
+        const data: SavedTake[] = await response.json();
+        if (!controller.signal.aborted) setTakes(data.map(toTake));
+      } catch (err) {
+        if (!controller.signal.aborted) {
+          setError(err instanceof Error ? err.message : "Could not load your takes.");
+        }
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
+    void loadTakes();
+    return () => controller.abort();
+  }, []);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (saving) return;
+    setSaveError("");
+    if (!selectedMedia || selectedMedia.media_type !== category) {
+      setSaveError("Search for a title and select a matching result.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const response = await fetch("/api/takes", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          media: selectedMedia,
+          rating, comment: comment.trim() || null, watched_on: null,
+        }),
+      });
+      if (response.status === 401) {
+        setNeedsLogin(true);
+        return;
+      }
+      if (!response.ok) throw new Error(await responseError(response));
+      const saved: SavedTake = await response.json();
+      setTakes((current) => [toTake(saved), ...current]);
+      setSelectedType("all");
+      setSelectedMedia(null);
+      setSearchVersion((current) => current + 1);
+      setRating(3);
+      setComment("");
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Could not save your take.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   const [selectedType, setSelectedType] =
     useState<MediaType | "all">("all");
@@ -112,28 +181,56 @@ function MyTakes() {
     );
   });
 
+  if (loading) return <main><p role="status">Loading your takes...</p></main>;
+  if (needsLogin) return <main><p><Link to="/login">Log in</Link> to view and save your takes.</p></main>;
+
   return (
     <main className="my-takes-page">
+      <div className="page-header">
+        <h1>My Takes</h1>
+        <p>Your ratings for movies, shows, music, games, and more.</p>
+      </div>
 
-      <section className="explore-section">
-        <h2>Explore Media</h2>
-
-        <div className="category-grid">
-          {categories.map((category) => (
-            <CategoryCard
-              key={category.id}
-              category={category}
-            />
-          ))}
-        </div>
+      <section className="media-section">
+        <h2>Log a take</h2>
+        <form className="take-form" onSubmit={handleSubmit}>
+          <fieldset disabled={saving || Boolean(error)}>
+            <legend>New take</legend>
+            <label htmlFor="take-category">Category</label>
+            <select id="take-category" value={category} onChange={(event) => {
+              setCategory(event.target.value as MediaType);
+              setSelectedMedia(null);
+              setSaveError("");
+            }}>
+              {categories.map((item) => (
+                <option key={item.id} value={item.id} disabled={item.id === "podcast"}>
+                  {item.name}{item.id === "podcast" ? " (coming soon)" : ""}
+                </option>
+              ))}
+            </select>
+            <MediaSearch key={`${category}-${searchVersion}`} category={category} value={selectedMedia} onChange={setSelectedMedia} />
+            <label htmlFor="rating">Rating</label>
+            <select id="rating" value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+              {Array.from({ length: 10 }, (_, i) => (i + 1) / 2).map((value) => (
+                <option key={value} value={value}>{value} / 5</option>
+              ))}
+            </select>
+            <label htmlFor="comment">Your take (optional)</label>
+            <textarea id="comment" value={comment} onChange={(e) => setComment(e.target.value)} maxLength={2000} />
+            <button type="submit" disabled={!selectedMedia}>{saving ? "Saving..." : "Save take"}</button>
+          </fieldset>
+          {saveError && <p role="alert">{saveError}</p>}
+        </form>
       </section>
 
-      <section className="takes-section">
-        <h2>My Takes</h2>
+      <section className="media-section takes-section">
+        <h2>Your Ratings</h2>
+        {error && <p role="alert">{error} Refresh to try again.</p>}
 
         <div className="filter-row">
           <button
             className={selectedType === "all" ? "active" : ""}
+            aria-pressed={selectedType === "all"}
             onClick={() => setSelectedType("all")}
           >
             All
@@ -142,6 +239,7 @@ function MyTakes() {
           {categories.map((category) => (
             <button
               key={category.id}
+              aria-pressed={selectedType === category.id}
               className={
                 selectedType === category.id ? "active" : ""
               }
@@ -152,18 +250,21 @@ function MyTakes() {
           ))}
         </div>
 
-        <div className="takes-grid">
+        <div className="media-grid">
           {filteredTakes.map((take) => (
+            <article key={take.id}>
             <MediaCard
               key={take.id}
               media={take.media}
               rating={take.rating}
             />
+            {take.comment && <p>{take.comment}</p>}
+            </article>
           ))}
         </div>
 
-        {filteredTakes.length === 0 && (
-          <p>You haven't logged any takes in this category.</p>
+        {!error && filteredTakes.length === 0 && (
+          <p className="takes-empty" role="status">You haven't logged any takes in this category.</p>
         )}
       </section>
 
