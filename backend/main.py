@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base
 from models import Media
 from schemas import MediaCreate, MediaResponse, GridGuess
-from grid_game import ACTORS, GENRES, YEARS, CLUES, matches_clue, new_grid
+from grid_game import CLUES, matches_clue, new_grid
 
 
 app = FastAPI()
@@ -44,7 +44,7 @@ def get_grid():
 
 @app.post("/api/grid/guess")
 async def check_grid_guess(guess: GridGuess):
-  if guess.row_id not in {clue["id"] for clue in ACTORS + GENRES} or guess.column_id not in {clue["id"] for clue in YEARS}:
+  if guess.row_id not in CLUES or guess.column_id not in CLUES:
     raise HTTPException(status_code=400, detail="Unknown grid clue")
   if not guess.movie_id.isascii() or not guess.movie_id.isdecimal() or len(guess.movie_id) > 12:
     raise HTTPException(status_code=400, detail="Invalid movie ID")
