@@ -9,6 +9,7 @@ import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import MyLists from "./pages/MyLists";
 import GridGame from "./pages/GridGame";
+import MediaDetails from "./pages/MediaDetails";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/grid" element={<GridGame />} />
         <Route path="/takes" element={<MyTakes />} />
+        <Route path="/media/:mediaType/:source/:externalId" element={<MediaDetails />} />
         <Route path="/lists" element={<MyLists />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />

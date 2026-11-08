@@ -747,6 +747,48 @@ main {
 .list-remove:hover { border-color: #f97316; color: #f97316; }
 .my-lists-page button:disabled { opacity: 0.6; cursor: default; }
 
+/* Media details */
+.detail-back { display: inline-block; margin-bottom: 24px; font-size: 14px; }
+.detail-back:hover, .media-details a:hover { color: #f97316; }
+.detail-hero { display: grid; grid-template-columns: minmax(150px, 260px) minmax(0, 1fr); gap: 32px; margin-bottom: 40px; }
+.detail-poster { aspect-ratio: 2 / 3; background: #d5e1ec; display: flex; align-items: center; justify-content: center; font-size: 64px; }
+.detail-poster img { width: 100%; height: 100%; object-fit: cover; }
+.detail-hero .page-header { margin-bottom: 16px; }
+.detail-tagline { color: #64748b; font-style: italic; }
+.detail-overview { line-height: 1.7; white-space: pre-line; }
+.detail-add { padding: 12px 20px; border: 1px solid #22447e; background: #22447e; color: white; cursor: pointer; margin-top: 12px; }
+.detail-add:hover { background: #18345f; }
+.media-details button:focus-visible, .media-details a:focus-visible { outline: 2px solid #f97316; outline-offset: 4px; }
+.detail-trailer { display: block; width: 100%; max-width: 900px; aspect-ratio: 16 / 9; border: 0; background: #172b4d; }
+.detail-metadata { margin: 0; }
+.detail-metadata > div { padding: 14px 0; border-bottom: 1px solid #d5e1ec; }
+.detail-metadata dt { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.detail-metadata dd { margin: 0; font-size: 14px; color: #52647e; overflow-wrap: anywhere; line-height: 1.6; }
+.detail-metadata img { display: block; width: 100%; max-width: 200px; height: auto; }
+.detail-metadata dd > img { max-width: 700px; }
+.detail-collection { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
+.detail-item { min-width: 0; }
+.media-details audio { max-width: 100%; }
+@media (max-width: 600px) {
+  .detail-hero { grid-template-columns: 1fr; gap: 24px; }
+  .detail-poster { width: 200px; max-width: 100%; }
+}
+
+.detail-summary > .detail-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin: 20px 0 8px;
+}
+.detail-summary > .detail-metadata > div {
+  flex: 1 1 140px;
+  padding: 8px 0;
+}
+.detail-summary > .detail-metadata > div:has(.detail-collection) {
+  flex-basis: 100%;
+}
+.detail-summary .detail-metadata dt { margin-bottom: 2px; }
+.detail-summary .detail-metadata dd { font-size: 13px; }
 
 /* floating "+" button (AddTakeButton.tsx) */
 
