@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import "../styles/login.css";
 
 function Signup() {
 
-    const [email, setEmail] = useState("");
+    const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -13,8 +13,9 @@ function Signup() {
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        if (loading) return;
         setError("");
-        if (!email.trim() || !username.trim() || !password.trim() || !confirmPassword.trim()) {
+        if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
             setError("Please fill in all fields.");
             return;
         }
@@ -28,19 +29,23 @@ function Signup() {
         }
         setLoading(true);
         try {
-            /*
             const response = await fetch("/api/auth/register", {
                 method: "POST",
+                credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, username, password }),
+                body: JSON.stringify({ username: username.trim(), password }),
             });
             if (!response.ok) {
-                throw new Error("Failed to create account.");
+                const body = await response.json().catch(() => null);
+                throw new Error(
+                    typeof body?.detail === "string"
+                        ? body.detail
+                        : "Failed to create account.",
+                );
             }
-            navigate("/my-takes");
-            */
+            navigate("/takes", { replace: true });
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to create account.");
         } finally {
@@ -56,15 +61,6 @@ function Signup() {
                     <p>Create an account to join Hot Takes!</p>
                 </div>
                 <form className="signup-form" onSubmit={handleSubmit}>
-                    <label htmlFor="email">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        autoComplete="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
                     <label htmlFor="username">Username</label>
                     <input
                         id="username"
@@ -92,7 +88,7 @@ function Signup() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                     />
-                    {error && <p className="signup-error">{error}</p>}
+                    {error && <p className="signup-error" role="alert">{error}</p>}
                     <button type="submit" disabled={loading}>
                         {loading ? "Creating Account..." : "Sign Up"}
                     </button>
