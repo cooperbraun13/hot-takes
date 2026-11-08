@@ -832,8 +832,7 @@ main {
   display: grid;
   place-items: center;
   color: #ffffff;
-  background: linear-gradient(135deg, #fb923c, #f97316 55%, #ea580c);
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4), 0 2px 6px rgba(34, 68, 126, 0.2);
+  background: #f97316;
   cursor: pointer;
 }
 
