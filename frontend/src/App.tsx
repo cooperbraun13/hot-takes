@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
+import GridGame from "./pages/GridGame";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/books" element={<Home />} />
         <Route path="/music" element={<Home />} />
         <Route path="/games" element={<Home />} />
+        <Route path="/grid" element={<GridGame />} />
       </Routes>
 
       <Footer />
