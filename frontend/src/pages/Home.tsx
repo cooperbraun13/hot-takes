@@ -14,8 +14,8 @@ const media: Media[] = [
   },
   {
     id: "2",
-    external_source: "igdb",
-    external_id: "example-minecraft",
+    external_source: "twitch",
+    external_id: "27471",
     title: "Minecraft",
     media_type: "game",
     year: 2011,
@@ -24,13 +24,23 @@ const media: Media[] = [
   },
   {
     id: "3",
-    external_source: "sample",
-    external_id: "example-1984",
+    external_source: "local",
+    external_id: "1984",
     title: "1984",
     media_type: "book",
     year: 1949,
     cover_url: null,
     description: "A dystopian novel.",
+  },
+  {
+    id: "4",
+    external_source: "tmdb",
+    external_id: "97400",
+    title: "Midnight Mass",
+    media_type: "tv",
+    year: 2021,
+    cover_url: null,
+    description: "Religious supernatural horror drama mini-series.",
   },
 ];
 
