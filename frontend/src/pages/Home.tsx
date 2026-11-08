@@ -1,5 +1,5 @@
 import MediaCard from "../components/MediaCard";
-import type { Media } from "../types";
+import type { Media, MediaType } from "../types";
 
 const media: Media[] = [
   {
@@ -44,21 +44,36 @@ const media: Media[] = [
   },
 ];
 
-export default function Home() {
+export default function Home({ mediaType }: { mediaType?: MediaType }) {
+  const categoryLabels: Record<MediaType, string> = {
+    movie: "Movies",
+    tv: "TV Shows",
+    music: "Music",
+    game: "Games",
+    book: "Books",
+    podcast: "Podcasts",
+  };
+  const category = mediaType ? categoryLabels[mediaType] : null;
+  const visibleMedia = mediaType
+    ? media.filter((item) => item.media_type === mediaType)
+    : media;
   return (
     <main>
       <div className="page-header">
-        <h1>Discover what's trending.</h1>
-        <p>Movies, shows, books, music, games, and more.</p>
+        <h1>{category ? `Discover ${category}.` : "Discover what's trending."}</h1>
+        <p>{category ? `Explore ${category.toLowerCase()} and find your next favorite.` : "Movies, shows, books, music, games, and more."}</p>
       </div>
 
       <section className="media-section">
-        <h2>Trending This Week</h2>
+        <h2>{category ? `Trending ${category}` : "Trending This Week"}</h2>
         <div className="media-grid">
-          {media.map((item) => (
+          {visibleMedia.map((item) => (
             <MediaCard key={item.id} media={item} />
           ))}
         </div>
+        {visibleMedia.length === 0 && (
+          <p>No {category?.toLowerCase()} added yet.</p>
+        )}
       </section>
 
       <section className="media-banner">
@@ -66,7 +81,7 @@ export default function Home() {
         <p>Rate what you love. Review what you hate.</p>
       </section>
 
-      <section className="media-section">
+      {!mediaType && <section className="media-section">
         <h2>Popular in Games</h2>
         <div className="media-grid">
           {media
@@ -75,7 +90,7 @@ export default function Home() {
               <MediaCard key={item.id} media={item} />
             ))}
         </div>
-      </section>
+      </section>}
     </main>
   );
 }
