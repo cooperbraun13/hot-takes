@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE = "https://api.themoviedb.org/3"
-IMG = "https://image.tmdb.org/t/p/w500"
+IMG = "https://image.tmdb.org/t/p"
 
 #should get an image link, if there isn't an image should return none
 def _img(path, size="w500"):
@@ -25,13 +25,14 @@ async def search_movies(query: str):
     data = await _get("/search/movie", query=query)
     return [
         {
+            "media_type": "movie",
+            "external_source": "tmdb",
             "external_id": str(m["id"]),
             "title": m["title"],
-            "year": (m.get("release_date") or "")[:4],
-            "overview": m.get("overview"),
+            "year": int(m["release_date"][:4]) if m.get("release_date") else None,
+            "cover_url": _img(m.get("poster_path")),
+            "description": m.get("overview"),
             "rating": m.get("vote_average"),
-            "cover_Url": _img(m.get("poster_path")),
-            "source": "tmdb",
         }
         for m in data["results"]
     ]
@@ -79,7 +80,7 @@ async def search_tv(query: str):
             "year": (s.get("first_air_date") or "")[:4],
             "overview": s.get("overview"),
             "rating": s.get("vote_average"),
-            "cover_Url": _img(s.get("poster_path")),
+            "cover_url": _img(s.get("poster_path")),
             "source": "tmdb",
         }
         for s in data["results"]
