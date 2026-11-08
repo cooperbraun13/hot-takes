@@ -7,14 +7,15 @@ from services import gamesAPI
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base
 from models import Media
-from schemas import MediaCreate, MediaResponse
+from schemas import MediaCreate, MediaResponse, GridGuess
+from grid_game import ACTORS, GENRES, YEARS, CLUES, matches_clue, new_grid
 
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # your teammate's dev server port
+    allow_origins=["http://localhost:5173"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -36,6 +37,31 @@ async def movie_details(movie_id: str):
     except httpx.HTTPError as e:
         print("TMDB ERROR:", repr(e))
         raise HTTPException(status_code=502, detail="Upstream API failed Movie ID")
+
+@app.get("/api/grid")
+def get_grid():
+  return new_grid()
+
+@app.post("/api/grid/guess")
+async def check_grid_guess(guess: GridGuess):
+  if guess.row_id not in {clue["id"] for clue in ACTORS + GENRES} or guess.column_id not in {clue["id"] for clue in YEARS}:
+    raise HTTPException(status_code=400, detail="Unknown grid clue")
+  if not guess.movie_id.isascii() or not guess.movie_id.isdecimal() or len(guess.movie_id) > 12:
+    raise HTTPException(status_code=400, detail="Invalid movie ID")
+
+  try:
+    movie = await tmdb.get_movie_grid_facts(guess.movie_id)
+  except httpx.HTTPStatusError as error:
+    if error.response.status_code == 404:
+      raise HTTPException(status_code=404, detail="Movie not found") from error
+    raise HTTPException(status_code=502, detail="Movie lookup failed") from error
+  except httpx.HTTPError as error:
+    raise HTTPException(status_code=502, detail="Movie lookup failed") from error
+
+  return {
+    "correct": matches_clue(movie, CLUES[guess.row_id]) and matches_clue(movie, CLUES[guess.column_id]),
+    "movie": {"id": movie["id"], "title": movie["title"], "year": movie["release_date"][:4]},
+  }
     
 # Tv Routing
 @app.get("/api/search/tv")
