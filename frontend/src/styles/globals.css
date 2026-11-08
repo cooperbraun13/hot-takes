@@ -789,3 +789,46 @@ main {
 }
 .detail-summary .detail-metadata dt { margin-bottom: 2px; }
 .detail-summary .detail-metadata dd { font-size: 13px; }
+
+/* floating "+" button (AddTakeButton.tsx) */
+
+.add-take-button {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 100;
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: linear-gradient(135deg, #fb923c, #f97316 55%, #ea580c);
+  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4), 0 2px 6px rgba(34, 68, 126, 0.2);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.add-take-button:hover {
+  transform: translateY(-2px) rotate(90deg);
+  box-shadow: 0 12px 26px rgba(249, 115, 22, 0.5), 0 3px 8px rgba(34, 68, 126, 0.25);
+}
+
+.add-take-button:active {
+  transform: scale(0.94);
+}
+
+.add-take-button:focus-visible {
+  outline: 3px solid #22447e;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .add-take-button {
+    right: 16px;
+    bottom: 16px;
+    width: 54px;
+    height: 54px;
+  }
+}

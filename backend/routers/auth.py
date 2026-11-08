@@ -66,3 +66,9 @@ def login(body: UserCreate, request: Request, db: Session = Depends(get_db)):
 @router.post("/logout", status_code=204)
 def logout(request: Request):
   request.session.clear()
+
+
+@router.get("/me", response_model=UserOut)
+def me(user: User = Depends(get_current_user)):
+  """Who is logged in? 401 if nobody."""
+  return user
