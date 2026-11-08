@@ -8,7 +8,7 @@ import type {
   Take,
 } from "../types";
 
-import "../styles/MyTakes.css";
+import "../styles/globals.css";
 
 const categories: MediaCategory[] = [
   {

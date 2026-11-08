@@ -5,6 +5,7 @@ from services import moviesAPI as tmdb
 from services import musicAPI
 from services import gamesAPI
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from database import SessionLocal, engine, Base
 from models import Media
 from schemas import MediaCreate, MediaResponse
@@ -113,6 +114,17 @@ Base.metadata.create_all(bind=engine)
 def get_db():
   with SessionLocal() as db:
     yield db
+
+# Books are populated with sql/seed_books.sql.
+@app.get("/api/books/{book_id}")
+def book_details(book_id: str, db: Session = Depends(get_db)):
+  book = db.execute(
+    text("SELECT id, title, author, year, description, cover_url FROM books WHERE id = :id"),
+    {"id": book_id},
+  ).mappings().first()
+  if book is None:
+    raise HTTPException(status_code=404, detail="Book not found")
+  return dict(book)
     
 # get all media
 @app.get("/app/media", response_model=list[MediaResponse])
