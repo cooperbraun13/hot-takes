@@ -16,7 +16,7 @@ def _img(path, size="w500"):
 async def _get(path, **params):
     params["api_key"] = os.getenv("MOVIES_TV")
     async with httpx.AsyncClient() as client:
-        res = await client.get(f"{BASE}/{path}", params=params)
+        res = await client.get(f"{BASE}/{path.lstrip('/')}", params=params)
         res.raise_for_status()
         return res.json()
     
@@ -68,8 +68,21 @@ async def get_movie(movie_id: str):
         ],
         "source": "tmdb",
     }
+
+async def get_movie_grid_facts(movie_id: str):
+  """
+  Fetch the complete cast and movie metadata needed to check grid clues.
+  """
+  movie = await _get(f"movie/{movie_id}", append_to_response="credits")
+  return {
+    "id": str(movie["id"]),
+    "title": movie["title"],
+    "release_date": movie.get("release_date") or "",
+    "genre_ids": {genre["id"] for genre in movie.get("genres", [])},
+    "cast_names": {member["name"].casefold() for member in movie.get("credits", {}).get("cast", [])},
+  }
     
-    # Returns a list of TV shows that match the search
+# Returns a list of TV shows that match the search
 async def search_tv(query: str):
     data = await _get("/search/tv", query=query)
     return [
