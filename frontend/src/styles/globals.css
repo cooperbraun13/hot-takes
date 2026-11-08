@@ -266,6 +266,44 @@ main {
   cursor: wait;
 }
 
+.media-search {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.media-search p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.media-search-results {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid #d5e1ec;
+}
+
+.media-search-results button {
+  width: 100%;
+  text-align: left;
+  background: white;
+  color: #22447e;
+  border-bottom: 1px solid #d5e1ec;
+}
+
+.media-search-results button:hover,
+.media-search-results button:focus-visible {
+  background: #eef4fa;
+}
+
+.media-search input[readonly] {
+  background: #eef4fa;
+  color: #64748b;
+}
+
 .takes-empty {
   margin: 0;
   padding: 28px;
