@@ -1,62 +1,50 @@
+import { useEffect, useState } from "react";
 import MediaCard from "../components/MediaCard";
 import type { Media, MediaType } from "../types";
 
-const media: Media[] = [
-  {
-    id: "1",
-    external_source: "tmdb",
-    external_id: "157336",
-    title: "Interstellar",
-    media_type: "movie",
-    year: 2014,
-    cover_url: null,
-    description: "A science fiction movie.",
-  },
-  {
-    id: "2",
-    external_source: "twitch",
-    external_id: "27471",
-    title: "Minecraft",
-    media_type: "game",
-    year: 2011,
-    cover_url: null,
-    description: "A sandbox game.",
-  },
-  {
-    id: "3",
-    external_source: "local",
-    external_id: "1984",
-    title: "1984",
-    media_type: "book",
-    year: 1949,
-    cover_url: null,
-    description: "A dystopian novel.",
-  },
-  {
-    id: "4",
-    external_source: "tmdb",
-    external_id: "97400",
-    title: "Midnight Mass",
-    media_type: "tv",
-    year: 2021,
-    cover_url: null,
-    description: "Religious supernatural horror drama mini-series.",
-  },
-];
+const categoryLabels: Record<MediaType, string> = {
+  movie: "Movies", tv: "TV Shows", music: "Music",
+  game: "Games", book: "Books", podcast: "Podcasts",
+};
 
 export default function Home({ mediaType }: { mediaType?: MediaType }) {
-  const categoryLabels: Record<MediaType, string> = {
-    movie: "Movies",
-    tv: "TV Shows",
-    music: "Music",
-    game: "Games",
-    book: "Books",
-    podcast: "Podcasts",
-  };
+  const requestKey = mediaType ?? "home";
+  const [result, setResult] = useState<{
+    key: string; items: Media[]; errors: string[];
+  } | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const types: MediaType[] = mediaType ? [mediaType] : ["movie", "tv", "music", "book", "game"];
+    async function loadMedia() {
+      const responses = await Promise.allSettled(types.map(async (type) => {
+        const response = await fetch(`/api/discover/${type}?limit=4`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error(`Could not load ${categoryLabels[type].toLowerCase()}.`);
+        return await response.json() as Media[];
+      }));
+      if (controller.signal.aborted) return;
+      const items: Media[] = [];
+      const errors: string[] = [];
+      responses.forEach((response, index) => {
+        if (response.status === "fulfilled") items.push(...response.value);
+        else errors.push(`Could not load ${categoryLabels[types[index]].toLowerCase()}. Please try refreshing.`);
+      });
+      setResult({ key: requestKey, items, errors });
+    }
+    void loadMedia();
+    return () => controller.abort();
+  }, [mediaType, requestKey]);
+
+  const current = result?.key === requestKey ? result : null;
+  const loading = !current;
+  const items = current?.items ?? [];
   const category = mediaType ? categoryLabels[mediaType] : null;
-  const visibleMedia = mediaType
-    ? media.filter((item) => item.media_type === mediaType)
-    : media;
+  const visibleMedia = mediaType ? items : ["movie", "tv", "music", "book"].flatMap(
+    (type) => items.filter((item) => item.media_type === type).slice(0, 1),
+  );
+
   return (
     <main>
       <div className="page-header">
@@ -64,15 +52,15 @@ export default function Home({ mediaType }: { mediaType?: MediaType }) {
         <p>{category ? `Explore ${category.toLowerCase()} and find your next favorite.` : "Movies, shows, books, music, games, and more."}</p>
       </div>
 
-      <section className="media-section">
-        <h2>{category ? `Trending ${category}` : "Trending This Week"}</h2>
+      <section className="media-section" aria-busy={loading}>
+        <h2>{category ? `Discover ${category}` : "Trending This Week"}</h2>
+        {loading && <p role="status">Loading media…</p>}
+        {current?.errors.map((error) => <p role="alert" key={error}>{error}</p>)}
         <div className="media-grid">
-          {visibleMedia.map((item) => (
-            <MediaCard key={item.id} media={item} />
-          ))}
+          {visibleMedia.map((item) => <MediaCard key={item.id} media={item} />)}
         </div>
-        {visibleMedia.length === 0 && (
-          <p>No {category?.toLowerCase()} added yet.</p>
+        {!loading && !current?.errors.length && visibleMedia.length === 0 && (
+          <p>No {category?.toLowerCase() ?? "media"} available yet.</p>
         )}
       </section>
 
@@ -81,16 +69,16 @@ export default function Home({ mediaType }: { mediaType?: MediaType }) {
         <p>Rate what you love. Review what you hate.</p>
       </section>
 
-      {!mediaType && <section className="media-section">
-        <h2>Popular in Games</h2>
-        <div className="media-grid">
-          {media
-            .filter((item) => item.media_type === "game")
-            .map((item) => (
+      {!mediaType && (
+        <section className="media-section">
+          <h2>Popular in Games</h2>
+          <div className="media-grid">
+            {items.filter((item) => item.media_type === "game").map((item) => (
               <MediaCard key={item.id} media={item} />
             ))}
-        </div>
-      </section>}
+          </div>
+        </section>
+      )}
     </main>
   );
 }

@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Depends,HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
+from typing import Literal
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from services import moviesAPI as tmdb
 from services import musicAPI
 from services import gamesAPI
+from services.discovery import discover, media_item
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from database import SessionLocal, engine, Base
@@ -112,6 +114,23 @@ Base.metadata.create_all(bind=engine)
 def get_db():
   with SessionLocal() as db:
     yield db
+
+@app.get("/api/discover/{media_type}")
+async def discover_media(
+    media_type: Literal["movie", "tv", "game", "music", "book"],
+    limit: int = Query(default=4, ge=1, le=10),
+    db: Session = Depends(get_db),
+):
+    if media_type == "book":
+        books = db.execute(text(
+            "SELECT id, title, year, description, cover_url FROM books ORDER BY rowid LIMIT :limit"
+        ), {"limit": limit}).mappings().all()
+        return [media_item("book", "local", b["id"], b["title"], b["cover_url"],
+                           b["year"], b["description"]) for b in books]
+    try:
+        return await discover(media_type, limit)
+    except httpx.HTTPError:
+        raise HTTPException(status_code=502, detail="Could not load media from the upstream API")
 
 # Books are populated with sql/seed_books.sql.
 @app.get("/api/books/{book_id}")
